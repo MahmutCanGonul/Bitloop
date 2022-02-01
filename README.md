@@ -6,6 +6,12 @@ Package:
                       pip install fernet
                       pip install Flask
 
+Whitepaper:
+          
+  https://github.com/MahmutCanGonul/Bitloop/blob/main/Bitloop.docx
+
+
+
 Description:
 
 
