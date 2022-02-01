@@ -42,6 +42,21 @@ Decrypted system work:
 
 
 
+References:
+
+https://cryptography.io/en/latest/fernet/
+
+https://csrc.nist.gov/publications/detail/sp/800-90a/archive/2012-01-23
+
+https://www.youtube.com/watch?v=ulg_AHBOIQU&ab_channel=Numberphile
+
+https://en.wikipedia.org/wiki/Cryptography
+
+https://flask.palletsprojects.com/en/2.0.x/
+
+https://blog.malwarebytes.com/threat-analysis/2018/03/encryption-101-how-to-break-encryption/
+
+https://www.nsa.gov/portals/75/documents/resources/everyone/csfc/capability-packages/dar-cp.pdf
 
 
 
