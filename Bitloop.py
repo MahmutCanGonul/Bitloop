@@ -19,6 +19,8 @@ fernet2 = Fernet(key2)
 
  
 ciphers = []
+decrypted_ciphers = []
+
 
 
 app = Flask(__name__)
@@ -54,16 +56,17 @@ def encrypted():
     for i in range(len(ciphers)):
         key = ciphers[i].split(',')
         keys.append(key[1]+","+key[len(key)-1])
-    
+    resultCipher = keys[len(keys)-1]
     random.shuffle(keys) #Every request changing the order randomly of keys
     
-    response = {'ciphers':keys}    
+    response = {'ciphers':resultCipher}    
     return jsonify(response),201
     
 
 @app.route('/decrypted',methods = ['POST'])
 def decrypted():
     try:
+        
         text = request.get_json()
         keys = ['encrypted']
         if not all(key in text for key in keys):
@@ -107,6 +110,9 @@ def decrypted():
         
     except:
         dec = "Encrypted message is not valid!"
+    if dec != "Encrypted message is not valid!":
+        decrypted_ciphers.append(key+","+str(datetime.datetime.now()))
+        
     result = f'{dec}'
     response = {'result':result}    
     return jsonify(response),201
@@ -115,6 +121,11 @@ def decrypted():
 @app.route('/encrypted_data_length',methods = ['GET'])
 def encrypted_data_length():
     response = {"total_len":len(ciphers)}
+    return jsonify(response),200
+
+@app.route('/decrypted_data_length',methods = ['GET'])
+def decrypted_data_length():
+    response = {'total_len':len(decrypted_ciphers)}
     return jsonify(response),200
     
 
@@ -145,6 +156,22 @@ def remove_key():
             ciphers.pop(i)
             isFoundKey=True
             break
+    index = len(decrypted_ciphers)
+    if index > 0:
+        while True:
+            index-=1
+            data = decrypted_ciphers[index].split(',')
+            if data[0] == text['key']:
+                decrypted_ciphers.pop(index)
+                index = len(decrypted_ciphers)
+                if index ==0:
+                   break
+            else:
+                 if index == 0:
+                   break
+            
+        
+            
     if isFoundKey:
         response = {'result':'Key is successfuly remove!'}
     else:
@@ -152,7 +179,50 @@ def remove_key():
     
     return jsonify(response),201
         
-            
 
+@app.route('/get_keys',methods = ['GET'])
+def get_keys():
+    keys = []
+    for i in range(len(ciphers)):
+        key = ciphers[i].split(',')
+        keys.append(key[1]+","+key[2])
+    random.shuffle(keys)
+    response = {'keys':keys}
+    return jsonify(response),200
+    
+        
+@app.route('/encrypted_probability',methods = ['GET'])
+def encrypted_probability():
+    dates = []
+    prob = None
+    for i in range(len(ciphers)):
+        cipher = ciphers[i].split(',')
+        dates.append(cipher[len(cipher)-1])
+    dates.sort()
+    if len(dates) >=2:
+        
+        beforeLast = dates[len(dates)-2].split(' ')
+        timeBeforeLast = beforeLast[len(beforeLast)-1].split(':')
+        last = dates[len(dates)-1].split(' ')
+        timeLast = last[len(last)-1].split(':')
+        
+        hour = float(timeLast[0])-float(timeBeforeLast[0])
+        minute = float(timeLast[1])-float(timeBeforeLast[1])
+        seconds = float(timeLast[2])-float(timeBeforeLast[2])
+        
+        if hour < 0:
+            hour = hour *-1
+        if minute <0:
+            minute = minute *-1
+        if seconds<0:
+            seconds = seconds *-1
+        prob = str(hour)+":"+str(minute)+":"+str(seconds)     
+        
+    response = {'probability':prob}
+    return jsonify(response),200
+
+
+
+   
 app.run(host = '127.0.0.1', port = 5000)
 
